@@ -9,7 +9,14 @@
 #include <atomic>
 #include <thread>
 #include <condition_variable>
-#include <immintrin.h>
+
+#if defined(__i386__) || defined(__x86_64__)
+	#include <immintrin.h>
+#elif defined(__arm64__)
+	#include "lib/sse2neon/sse2neon.h"
+#else
+	#error Unknown architecture
+#endif
 
 
 #if   defined(_WIN32)

@@ -1,6 +1,12 @@
 /* This file is part of the Spring engine (GPL v2 or later), see LICENSE.html */
 
-#include <xmmintrin.h> //SSE1
+#if defined(__i386__) || defined(__x86_64__)
+	#include <xmmintrin.h>
+#elif defined(__arm64__)
+	#include "lib/sse2neon/sse2neon.h"
+#else
+	#error Unknown architecture
+#endif
 
 #include "System/Matrix44f.h"
 #include "System/float4.h"

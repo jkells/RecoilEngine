@@ -11,8 +11,14 @@
 #include <algorithm>
 #include <cstring>
 
-#include <xmmintrin.h>
-#include <emmintrin.h>
+#if defined(__i386__) || defined(__x86_64__)
+	#include <xmmintrin.h>
+	#include <emmintrin.h>
+#elif defined(__arm64__)
+	#include "lib/sse2neon/sse2neon.h"
+#else
+	#error Unknown architecture
+#endif
 
 CR_BIND(CMatrix44f, )
 
