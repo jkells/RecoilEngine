@@ -8,4 +8,4 @@ rm -rf build
 mkdir build
 cd build
 
-cmake .. -DMARCH=armv8-a --debug-trycompile
+cmake .. -DMARCH=armv8-a -DSTREFLOP_SOFT=1
