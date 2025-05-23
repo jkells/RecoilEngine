@@ -407,8 +407,12 @@ endif()
 option(ENABLE_STREFLOP "build Spring with streflop support (REQUIRED FOR MULTIPLAYER)" TRUE)
 
 if (ENABLE_STREFLOP)
-## note: is removed in ./AI/CMakeLists.txt since it would break AI compilation
-add_definitions(-DSTREFLOP_SSE)
+	## note: is removed in ./AI/CMakeLists.txt since it would break AI compilation
+	if (MARCH STREQUAL "armv8-a")
+		add_definitions(-DSTREFLOP_SOFT)
+	else (MARCH STREQUAL "armv8-a")
+		add_definitions(-DSTREFLOP_SSE)
+	endif (MARCH STREQUAL "armv8-a")
 else ()
 add_definitions(-DNOT_USING_STREFLOP)
 endif ()
@@ -457,7 +461,7 @@ if (CMAKE_COMPILER_IS_GNUCXX)
 
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=${FALLBACK_MARCH} -mtune=generic ${FALLBACK_SSE_FLAGS}")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SSE_FLAGS} -mfpmath=sse") #SSE_FLAGS are now user input only
-	endif (NOT MARCH_FLAG STREQUAL "generic")
+	endif (MARCH_FLAG STREQUAL "armv8-a")
 elseif (MSVC)
 	set(MSVC_CXX_FLAGS "/arch:SSE2") #default, but still set explicitly
 	# silence warnings
@@ -498,7 +502,7 @@ else  (MSVC)
 	if (NOT APPLE)
 		# This flag blows up the compiler on macOS. The linker complains about no input files.
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pipe")
-	endif (APPLE)
+	endif (NOT APPLE)
 
 	if (UNIX)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
