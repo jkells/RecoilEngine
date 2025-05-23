@@ -30,3 +30,6 @@
 [submodule "rts/lib/lunasvg"]
 	path = rts/lib/lunasvg
 	url = https://github.com/sammycage/lunasvg.git
+[submodule "rts/lib/sse2neon"]
+	path = rts/lib/sse2neon
+	url = https://github.com/DLTcollab/sse2neon.git
