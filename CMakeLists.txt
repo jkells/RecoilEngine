@@ -111,7 +111,7 @@ endif (CMAKE_SIZEOF_VOID_P EQUAL 8)
 
 message(STATUS "Building Spring on ${MARCH_BITS}bit environment")
 set(BUILD_BITS "${MARCH_BITS}" CACHE STRING "Target arch machine type")
-message(STATUS "Targetting ${BUILD_BITS}bit")
+message(STATUS "Targetting ${MARCH} ${BUILD_BITS}bit")
 
 
 ### Install paths (relative to CMAKE_INSTALL_PREFIX)
@@ -431,8 +431,11 @@ if (CMAKE_COMPILER_IS_GNUCXX)
 		set(MARCH_FLAG "generic")
 	endif (MARCH_FLAG STREQUAL "")
 
-	if (NOT MARCH_FLAG STREQUAL "generic")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=${MARCH_FLAG} -mtune=${MARCH_FLAG}") #march/mtune define SSE flags
+	if (MARCH_FLAG STREQUAL "armv8-a")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=${MARCH_FLAG}")
+	elseif (NOT MARCH_FLAG STREQUAL "generic")			
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=${MARCH_FLAG} -mtune=${MARCH_FLAG}") #march/mtune define SSE flags		
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SSE_FLAGS} -mfpmath=sse") #SSE_FLAGS are now user input only
 	else (NOT MARCH_FLAG STREQUAL "generic")
 		set(FALLBACK_SSE_FLAGS "-msse")
 		#set(FALLBACK_SSE_FLAGS "${FALLBACK_SSE_FLAGS} -mmmx")
@@ -453,9 +456,8 @@ if (CMAKE_COMPILER_IS_GNUCXX)
 		endif (MARCH_BITS EQUAL 64)
 
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=${FALLBACK_MARCH} -mtune=generic ${FALLBACK_SSE_FLAGS}")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SSE_FLAGS} -mfpmath=sse") #SSE_FLAGS are now user input only
 	endif (NOT MARCH_FLAG STREQUAL "generic")
-
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SSE_FLAGS} -mfpmath=sse") #SSE_FLAGS are now user input only
 elseif (MSVC)
 	set(MSVC_CXX_FLAGS "/arch:SSE2") #default, but still set explicitly
 	# silence warnings
@@ -492,7 +494,12 @@ else  (MSVC)
 	# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer")
 	# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-omit-frame-pointer")
 
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IEEE_FP_FLAG} -pipe -fno-strict-aliasing ${VISIBILITY_HIDDEN} ${VISIBILITY_INLINES_HIDDEN}")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IEEE_FP_FLAG} -fno-strict-aliasing ${VISIBILITY_HIDDEN} ${VISIBILITY_INLINES_HIDDEN}")
+	if (NOT APPLE)
+		# This flag blows up the compiler on macOS. The linker complains about no input files.
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pipe")
+	endif (APPLE)
+
 	if (UNIX)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 	endif (UNIX)
