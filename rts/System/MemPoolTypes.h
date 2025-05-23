@@ -425,7 +425,15 @@ inline size_t StablePosAllocator<T>::Allocate(size_t numElems)
 	if (positionToSize.empty()) {
 		size_t returnPos = data.size();
 		data.resize(data.size() + numElems);
-		myLog("StablePosAllocator<T>::Allocate(%u) = %u [thread_id = %u]", uint32_t(numElems), uint32_t(returnPos), static_cast<uint32_t>(Threading::GetCurrentThreadId()));
+		Threading::NativeThreadId threadId = Threading::GetCurrentThreadId();
+		#if __APPLE__
+			uint64_t threadIdNumeric = 0;
+			pthread_threadid_np(threadId, &threadIdNumeric);
+		#else
+			uint32_t threadIdNumeric = static_cast<uint32_t>(threadId);
+		#endif	
+
+		myLog("StablePosAllocator<T>::Allocate(%u) = %u [thread_id = %u]", uint32_t(numElems), uint32_t(returnPos), threadIdNumeric);
 		return returnPos;
 	}
 
