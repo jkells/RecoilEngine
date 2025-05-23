@@ -94,6 +94,7 @@ if    (APPLE)
 	if    (MACOSX_BUNDLE)
 		add_definitions(-DMACOSX_BUNDLE)
 	endif (MACOSX_BUNDLE)
+	include_directories(/opt/homebrew/include)
 else  (APPLE)
 	set(MACOSX_BUNDLE FALSE)
 endif (APPLE)
@@ -409,7 +410,7 @@ option(ENABLE_STREFLOP "build Spring with streflop support (REQUIRED FOR MULTIPL
 if (ENABLE_STREFLOP)
 	## note: is removed in ./AI/CMakeLists.txt since it would break AI compilation
 	if (MARCH STREQUAL "armv8-a")
-		add_definitions(-DSTREFLOP_SOFT)
+		# TODO ARM port
 	else (MARCH STREQUAL "armv8-a")
 		add_definitions(-DSTREFLOP_SSE)
 	endif (MARCH STREQUAL "armv8-a")

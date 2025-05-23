@@ -8,4 +8,6 @@ rm -rf build
 mkdir build
 cd build
 
-cmake .. -DMARCH=armv8-a
+
+cmake .. -DMARCH=armv8-a -DENABLE_STREFLOP=0
+make VERBOSE=1
